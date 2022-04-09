@@ -4,69 +4,150 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public bool isGrounded;
-    public float playerSpeed;
-    public float jumpForce;
-    public float rotationSpeed;
-    Rigidbody rb;
-    public Camera cam;
-    CapsuleCollider capsuleCollider;
-    Quaternion playerRotation;
-    Quaternion camRotation;
-    private float minX = -90f;
-    private float maxX = 90f;
-
-
     // Start is called before the first frame update
+    public float playerSpeed;
+    public float playerJumpForce;
+    public float playerRotationSpeed;
+
+    public Camera cam;
+    public Animator animator;
+
+    Rigidbody rb;
+    CapsuleCollider colliders;
+
+    Quaternion camRotation;
+    Quaternion playerRotation;
+
+    float minX = -90f;
+    float maxX = 90f;
+    float inputX;
+    float inputz;
+    int ammo = 0;
+    int medical = 100;
+    int maxAmmo = 100;
+    int maxMedical = 100;
+    int reloadAmmo = 0;
+    int maxReloadAmmo = 10;
+
+
     void Start()
     {
-        rb = gameObject.GetComponent<Rigidbody>();
-        capsuleCollider = GetComponent<CapsuleCollider>();
-        //cam = gameObject.GetComponent<Camera>();
+        rb = GetComponent<Rigidbody>();
+        colliders = GetComponent<CapsuleCollider>();
+        //animator = GetComponent<Animator>();
+        //audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
-        float inputX = Input.GetAxis("Horizontal");
-        float inputZ = Input.GetAxis("Vertical");        
-        transform.position += new Vector3(inputX * playerSpeed, 0, inputZ * playerSpeed);
-        if((Input.GetKeyDown(KeyCode.Space))  &&  IsGrounded())
+        if (Input.GetKeyDown(KeyCode.F))
         {
-            rb.AddForce(Vector3.up * jumpForce);
+            animator.SetBool("isAiming", !animator.GetBool("isAiming"));
+        }
+        if (Input.GetMouseButtonDown(0) && !animator.GetBool("isFiring"))
+        {
+            if (ammo > 0)
+            {
+                //animator.SetBool("IsFiring", !animator.GetBool("IsFiring"));
+                animator.SetTrigger("isFiring");
+                ammo = Mathf.Clamp(ammo - 1, 0, maxAmmo);
+                Debug.Log("Ammo Fire Value: " + ammo);
+            }
+            else
+            {
+                // Trigger the sound for empty bullets 
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+
+            animator.SetTrigger("isReloading");
+            int amountAmmoNeeded = maxReloadAmmo - reloadAmmo;
+            int ammoAvailable = amountAmmoNeeded < ammo ? amountAmmoNeeded : ammo;
+
+            reloadAmmo += ammoAvailable;
+            ammo -= ammoAvailable;
+            Debug.Log("Ammo Loaded Value: " + ammo);
+            Debug.Log("Ammo Reloaded Value: " + reloadAmmo);
+        }
+        if (Mathf.Abs(inputX) > 0 || Mathf.Abs(inputz) > 0)
+        {
+            if (!animator.GetBool("isWalking"))
+                animator.SetBool("isWalking", true);
+        }
+        else if (animator.GetBool("isWalking"))
+        {
+            animator.SetBool("isWalking", false);
         }
 
-        float mouseX = Input.GetAxis("Mouse X") * rotationSpeed;
-        float mouseY = Input.GetAxis("Mouse Y") * rotationSpeed;
-        playerRotation *= Quaternion.Euler(0, mouseY, 0);
-        camRotation = ClamRotationPlayer(Quaternion.Euler(-mouseX, 0, 0) * camRotation);
+    }
+    private void FixedUpdate()
+    {
+        inputX = Input.GetAxis("Horizontal") * playerSpeed;
+        inputz = Input.GetAxis("Vertical") * playerSpeed;
+
+        transform.position += new Vector3(inputX, 0f, inputz);
+
+        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
+        {
+            rb.AddForce(Vector3.up * playerJumpForce);
+
+        }
+        float mouseX = Input.GetAxis("Mouse X") * playerRotationSpeed;
+        float mouseY = Input.GetAxis("Mouse Y") * playerRotationSpeed;
+        //Debug.Log(mouseY);
+        playerRotation = Quaternion.Euler(0f, mouseX, 0f) * playerRotation;
+        camRotation = Quaternion.Euler(-mouseY, 0f, 0f) * camRotation;
+        camRotation = ClampRotationPlayer(camRotation);
         this.transform.localRotation = playerRotation;
         cam.transform.localRotation = camRotation;
-        Debug.Log(mouseX);
-        Debug.Log(mouseY);
-                
+
     }
     public bool IsGrounded()
     {
-        RaycastHit raycastHit;
-        if (Physics.SphereCast(transform.position, capsuleCollider.radius, Vector3.down, out raycastHit, (capsuleCollider.height / 2f) - capsuleCollider.radius + 0.1f))
+        RaycastHit rayCastHit;
+        if (Physics.SphereCast(transform.position, colliders.radius, Vector3.down, out rayCastHit, (colliders.height / 2) - colliders.radius + 0.1f))
         {
             return true;
         }
         else
             return false;
+
     }
-    Quaternion ClamRotationPlayer(Quaternion quaternion)
+    public Quaternion ClampRotationPlayer(Quaternion n)
     {
-        quaternion.w = 1f;
-        quaternion.x /= quaternion.w;
-        quaternion.y /= quaternion.w;
-        quaternion.z /= quaternion.w;
-        float angleX = 2.0f * Mathf.Rad2Deg * Mathf.Atan(quaternion.x);
+        n.w = 1f;
+        n.x /= n.w;
+        n.y /= n.w;
+        n.z /= n.w;
+        float angleX = 2.0f * Mathf.Rad2Deg * Mathf.Atan(n.x);
         angleX = Mathf.Clamp(angleX, minX, maxX);
-        quaternion.x = Mathf.Tan(Mathf.Deg2Rad * 0.5f * angleX);
-        return quaternion;
+        n.x = Mathf.Tan(Mathf.Deg2Rad * angleX * 0.5f);
+        return (n);
     }
-
-
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Ammo" && ammo < maxAmmo)
+        {
+            Debug.Log("Collected box");
+            //ammo += 10;
+            ammo = Mathf.Clamp(ammo + 10, 0, maxAmmo);
+            Debug.Log("Ammo: " + ammo);
+            collision.gameObject.SetActive(false);
+        }
+        if (collision.gameObject.tag == "Medical" && medical < maxMedical)
+        {
+            Debug.Log("Collected medical box");
+            //medical += 10;
+            medical = Mathf.Clamp(medical + 10, 0, maxMedical);
+            collision.gameObject.SetActive(false);
+        }
+        else if (collision.gameObject.tag == "Lava")
+        {
+            // Need to Trigger dead sound , when medical is zero
+            medical = Mathf.Clamp(medical - 10, 0, maxMedical);
+            Debug.Log("Medical: " + medical);
+        }
+    }
 }
