@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     float maxX = 90f;
     float inputX;
     float inputz;
-    int ammo = 0;
+    int ammo = 50;
     int medical = 100;
     int maxAmmo = 100;
     int maxMedical = 100;
@@ -59,9 +59,13 @@ public class PlayerController : MonoBehaviour
                 // Trigger the sound for empty bullets 
             }
         }
+        if(Input.GetKeyDown(KeyCode.Space))// jumping with rifle
+        {
+            rb.AddForce(Vector2.up * playerJumpForce);
+            animator.SetTrigger("isJumping");
+        }
         if (Input.GetKeyDown(KeyCode.R))
         {
-
             animator.SetTrigger("isReloading");
             int amountAmmoNeeded = maxReloadAmmo - reloadAmmo;
             int ammoAvailable = amountAmmoNeeded < ammo ? amountAmmoNeeded : ammo;

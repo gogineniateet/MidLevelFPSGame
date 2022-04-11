@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class AudioController : MonoBehaviour
 {
-
-    AudioSource audioSource;
+    public List<AudioClip> audioClips;
+    public AudioSource audioSource;
     // Start is called before the first frame update
     void Start()
     {
@@ -15,6 +15,18 @@ public class AudioController : MonoBehaviour
     // Update is called once per frame
     public void ShotFire()
     {
-        audioSource.Play();
+        audioSource.PlayOneShot(audioClips[0]);
+    }
+    public void WalkSound()
+    {
+        audioSource.PlayOneShot(audioClips[1]);
+    }
+    public void JumpSound()
+    {
+        audioSource.PlayOneShot(audioClips[2]);
+    }
+    public  void LandSound()
+    {
+        audioSource.PlayOneShot(audioClips[3]);
     }
 }
