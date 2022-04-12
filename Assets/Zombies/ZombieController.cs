@@ -14,7 +14,7 @@ public class ZombieController : MonoBehaviour
 
     enum STATE { IDLE, WONDER, CHASE, ATTACK, DEAD}
     STATE state = STATE.IDLE; // default state
-    public AudioSource audioSource;
+   // public AudioSource audioSource;
 
 
     // Start is called before the first frame update
@@ -64,6 +64,11 @@ public class ZombieController : MonoBehaviour
             anim.SetBool("isDead", true);
         }
         */
+        if(target == null)
+        {
+            target = GameObject.FindGameObjectWithTag("Player");
+            return;
+        }
 
         switch (state)
         {
