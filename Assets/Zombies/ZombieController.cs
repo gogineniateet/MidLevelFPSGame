@@ -9,6 +9,7 @@ public class ZombieController : MonoBehaviour
     Animator anim; 
     public GameObject target;
     NavMeshAgent agent;
+    public AudioSource audioSource;
 
 
     // Start is called before the first frame update
@@ -23,6 +24,16 @@ public class ZombieController : MonoBehaviour
     void Update()
     {
         agent.SetDestination(target.transform.position);
+        if (agent.remainingDistance > agent.stoppingDistance)
+        {
+            anim.SetBool("isWalking", true);
+            anim.SetBool("isAttacking", false);
+        }
+        else
+        {
+            anim.SetBool("isWalking", false);
+            anim.SetBool("isAttacking", true);
+        }
         /*
         if (Input.GetKey(KeyCode.W))
         {
@@ -50,5 +61,9 @@ public class ZombieController : MonoBehaviour
             anim.SetBool("isDead", true);
         }
         */
+    }
+    public void ZombieSound()
+    {
+        audioSource.Play();
     }
 }

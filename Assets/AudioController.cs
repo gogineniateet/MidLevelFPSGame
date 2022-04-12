@@ -11,13 +11,11 @@ public class AudioController : MonoBehaviour
     {
         audioSource = GetComponent<AudioSource>();
     }
-
     // Update is called once per frame
     public void ShotFire()
     {
         audioSource.PlayOneShot(audioClips[0]);
-    }
-    
+    }    
     public void JumpSound()
     {
         audioSource.PlayOneShot(audioClips[1]);
@@ -41,6 +39,10 @@ public class AudioController : MonoBehaviour
     public void WalkSound4()
     {
         audioSource.PlayOneShot(audioClips[6]);
+    }
+    public void ZombieSound()
+    {
+        audioSource.PlayOneShot(audioClips[7]);
     }
 
 }
