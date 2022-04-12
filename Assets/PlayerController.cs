@@ -98,14 +98,24 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(Vector3.up * playerJumpForce);
 
         }
+        //float mouseX = Input.GetAxis("Mouse X") * playerRotationSpeed;
+        //float mouseY = Input.GetAxis("Mouse Y") * playerRotationSpeed;
+        ////Debug.Log(mouseY);
+        //playerRotation = Quaternion.Euler(0f, mouseX, 0f) * playerRotation;
+        //camRotation = Quaternion.Euler(-mouseY, 0f, 0f) * camRotation;
+        //camRotation = ClampRotationPlayer(camRotation);
+        //this.transform.localRotation = playerRotation;
+        //cam.transform.localRotation = camRotation;
+
         float mouseX = Input.GetAxis("Mouse X") * playerRotationSpeed;
         float mouseY = Input.GetAxis("Mouse Y") * playerRotationSpeed;
         //Debug.Log(mouseY);
-        playerRotation = Quaternion.Euler(0f, mouseX, 0f) * playerRotation;
-        camRotation = Quaternion.Euler(-mouseY, 0f, 0f) * camRotation;
+        playerRotation = Quaternion.Euler(0f, mouseX, 0f);
+        camRotation = Quaternion.Euler(-mouseY, 0f, 0f);
         camRotation = ClampRotationPlayer(camRotation);
-        this.transform.localRotation = playerRotation;
-        cam.transform.localRotation = camRotation;
+        // this.transform.localRotation = playerRotation;
+        transform.localRotation = playerRotation * transform.localRotation;
+        cam.transform.localRotation = camRotation * cam.transform.localRotation;
 
     }
     public bool IsGrounded()

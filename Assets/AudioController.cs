@@ -17,16 +17,30 @@ public class AudioController : MonoBehaviour
     {
         audioSource.PlayOneShot(audioClips[0]);
     }
-    public void WalkSound()
+    
+    public void JumpSound()
     {
         audioSource.PlayOneShot(audioClips[1]);
     }
-    public void JumpSound()
+    public  void LandSound()
     {
         audioSource.PlayOneShot(audioClips[2]);
     }
-    public  void LandSound()
+    public void WalkSound1()
     {
         audioSource.PlayOneShot(audioClips[3]);
     }
+    public void WalkSound2()
+    {
+        audioSource.PlayOneShot(audioClips[4]);
+    }
+    public void WalkSound3()
+    {
+        audioSource.PlayOneShot(audioClips[5]);
+    }
+    public void WalkSound4()
+    {
+        audioSource.PlayOneShot(audioClips[6]);
+    }
+
 }
