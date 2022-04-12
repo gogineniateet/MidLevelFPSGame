@@ -40,9 +40,6 @@ public class AudioController : MonoBehaviour
     {
         audioSource.PlayOneShot(audioClips[6]);
     }
-    public void ZombieSound()
-    {
-        audioSource.PlayOneShot(audioClips[7]);
-    }
+   
 
 }
