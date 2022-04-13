@@ -9,6 +9,8 @@ public class SpawnManager : MonoBehaviour
     public int number;
     public float spawnRadius;
     public bool spawnOnStart = true;
+    Vector3 result;
+
 
     // Start is called before the first frame update
     void Start()
@@ -16,7 +18,6 @@ public class SpawnManager : MonoBehaviour
         if(spawnOnStart)
         {
             CreateAllZombies();
-
         }
     }
 
@@ -28,7 +29,11 @@ public class SpawnManager : MonoBehaviour
             NavMeshHit hit;
             if (NavMesh.SamplePosition(randonPoint, out hit, 10f, NavMesh.AllAreas))
             {
-                Instantiate(zombiePrefabs[0], randonPoint, Quaternion.identity);
+                result = hit.position;
+                Instantiate(zombiePrefabs[0], result, Quaternion.identity);
+                //Instantiate(zombiePrefabs[1], result, Quaternion.identity);
+                //Instantiate(zombiePrefabs[2], result, Quaternion.identity);
+                //Instantiate(zombiePrefabs[3], result, Quaternion.identity);
             }
             else
             {
@@ -48,7 +53,6 @@ public class SpawnManager : MonoBehaviour
         if(!spawnOnStart && other.gameObject.tag == "Player")
         {
             CreateAllZombies();
-
         }
     }
 }

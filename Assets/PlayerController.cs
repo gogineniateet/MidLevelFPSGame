@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,7 +12,7 @@ public class PlayerController : MonoBehaviour
 
     public Camera cam;
     public Animator animator;
-
+    public Transform bulletLaunch;
     Rigidbody rb;
     CapsuleCollider colliders;
 
@@ -51,8 +52,9 @@ public class PlayerController : MonoBehaviour
             {
                 //animator.SetBool("IsFiring", !animator.GetBool("IsFiring"));
                 animator.SetTrigger("isFiring");
+                WhenZombieGotHit();
                 ammo = Mathf.Clamp(ammo - 1, 0, maxAmmo);
-                Debug.Log("Ammo Fire Value: " + ammo);
+                //Debug.Log("Ammo Fire Value: " + ammo);
             }
             else
             {
@@ -86,6 +88,35 @@ public class PlayerController : MonoBehaviour
         }
 
     }
+
+    public void WhenZombieGotHit()
+    {
+        RaycastHit hitInfo;
+        if(Physics.Raycast(bulletLaunch.position,bulletLaunch.forward,out hitInfo,100f))
+        {
+            GameObject hitZombie = hitInfo.collider.gameObject;
+            if (hitZombie.tag == "Zombie")
+            {
+                if(UnityEngine.Random.Range(0,10)<5)
+                {
+                    GameObject tempRD = hitZombie.GetComponent<ZombieController>().ragdollPrefab;
+                    GameObject newTempRD = Instantiate(tempRD, hitZombie.transform.position, hitZombie.transform.rotation);
+                    newTempRD.transform.Find("Hips").GetComponent<Rigidbody>().AddForce(Camera.main.transform.forward * 1000);
+                    Destroy(hitZombie);
+                }
+                else
+                {
+                    hitZombie.GetComponent<ZombieController>().KillZombie();
+                }
+                //GameObject tempRd = Instantiate(ragdollPrefab, this.transform.position, this.transform.rotation);
+                //tempRd.transform.Find("Hips").GetComponent<Rigidbody>().AddForce(Camera.main.transform.forward * 1000);
+                //Destroy(this.gameObject);
+                
+            }
+        }
+
+    }
+
     private void FixedUpdate()
     {
         inputX = Input.GetAxis("Horizontal") * playerSpeed;
@@ -98,15 +129,7 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(Vector3.up * playerJumpForce);
 
         }
-        //float mouseX = Input.GetAxis("Mouse X") * playerRotationSpeed;
-        //float mouseY = Input.GetAxis("Mouse Y") * playerRotationSpeed;
-        ////Debug.Log(mouseY);
-        //playerRotation = Quaternion.Euler(0f, mouseX, 0f) * playerRotation;
-        //camRotation = Quaternion.Euler(-mouseY, 0f, 0f) * camRotation;
-        //camRotation = ClampRotationPlayer(camRotation);
-        //this.transform.localRotation = playerRotation;
-        //cam.transform.localRotation = camRotation;
-
+        
         float mouseX = Input.GetAxis("Mouse X") * playerRotationSpeed;
         float mouseY = Input.GetAxis("Mouse Y") * playerRotationSpeed;
         //Debug.Log(mouseY);
@@ -127,7 +150,6 @@ public class PlayerController : MonoBehaviour
         }
         else
             return false;
-
     }
     public Quaternion ClampRotationPlayer(Quaternion n)
     {
@@ -161,7 +183,7 @@ public class PlayerController : MonoBehaviour
         {
             // Need to Trigger dead sound , when medical is zero
             medical = Mathf.Clamp(medical - 10, 0, maxMedical);
-            Debug.Log("Medical: " + medical);
+            //Debug.Log("Medical: " + medical);
         }
     }
 }
