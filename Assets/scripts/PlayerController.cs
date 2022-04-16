@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour
     public Camera cam;
     public Animator animator;
     public Transform bulletLaunch;
+    //public GameObject target;
+    public GameObject steveModelPrefab;
     Rigidbody rb;
     CapsuleCollider colliders;
 
@@ -186,4 +188,20 @@ public class PlayerController : MonoBehaviour
             //Debug.Log("Medical: " + medical);
         }
     }
+
+
+    public void TakeHit(float value)
+    {
+        medical = (int)Mathf.Clamp(medical - value, 0, maxMedical); //  medical is health
+        Debug.Log("heath :" + medical);
+        if(medical <= 0)
+        {
+            Vector3 position = new Vector3(transform.position.x, Terrain.activeTerrain.SampleHeight(this.transform.position), transform.position.z);
+            GameObject tempSteve = Instantiate(steveModelPrefab, position, this.transform.rotation);
+            tempSteve.GetComponent<Animator>().SetTrigger("Death");
+            GameState.isGameOver = true;
+            Destroy(this.gameObject);
+        }
+    }
+    
 }

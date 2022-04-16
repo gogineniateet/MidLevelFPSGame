@@ -2180,6 +2180,7 @@ GameObject:
   - component: {fileID: 5643912976069227624}
   - component: {fileID: 5542127211463571573}
   - component: {fileID: 5542127211463571574}
+  - component: {fileID: 6004774149380496396}
   - component: {fileID: 3038951806394210261}
   - component: {fileID: 1416367834}
   m_Layer: 3
@@ -2244,6 +2245,18 @@ MonoBehaviour:
   walkingSpeed: 1
   runningSpeed: 2
   state: 0
+--- !u!114 &6004774149380496396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8649283112028866171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fe786a8e9e02c44492a491341853e04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!195 &3038951806394210261
 NavMeshAgent:
   m_ObjectHideFlags: 0

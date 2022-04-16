@@ -8,11 +8,15 @@ public class ZombieController : MonoBehaviour
     public Animator anim;
     public GameObject target;
     public GameObject ragdollPrefab;
-    NavMeshAgent agent;
+    private NavMeshAgent agent;
+
     //udioSource audio;
     //public List<AudioClip> audioClips;
+
     public float walkingSpeed;
     public float runningSpeed;
+
+
     public enum STATE { IDLE, WONDER, CHASE, ATTACK, DEAD };
     public  STATE state = STATE.IDLE;//default state
     // Start is called before the first frame update
@@ -76,31 +80,29 @@ public class ZombieController : MonoBehaviour
         //    Destroy(this.gameObject);
         //    return;
         //}
-        if (target == null)
+        if (target == null && GameState.isGameOver == false)
         {
             target = GameObject.FindGameObjectWithTag("Player");
             return;
         }
         switch (state)
         {
-            case STATE.IDLE:
+            case STATE.IDLE: 
                 if (CanSeePlayer())
                     state = STATE.CHASE;
                 else if (Random.Range(0, 1000) < 5)
                 {
                     state = STATE.WONDER;
                 }
-
-
-
-
                 break;
+
+
             case STATE.WONDER:
                 if (!agent.hasPath)
                 {
                     float randValueX = transform.position.x + Random.Range(-5f, 5f);
                     float randValueZ = transform.position.z + Random.Range(-5f, 5f);
-                    // float ValueY = Terrain.activeTerrain.SampleHeight(new Vector3(randValueX, 0f, randValueZ));
+                    float ValueY = Terrain.activeTerrain.SampleHeight(new Vector3(randValueX, 0f, randValueZ));
                     Vector3 destination = new Vector3(randValueX, transform.position.y, randValueZ);
                     agent.SetDestination(destination);
                     agent.stoppingDistance = 0f;
@@ -118,8 +120,8 @@ public class ZombieController : MonoBehaviour
                     TurnOffAllTriggerAnim();
                     agent.ResetPath();
                 }
-
                 break;
+
 
             case STATE.CHASE:
                 agent.SetDestination(target.transform.position);
@@ -136,8 +138,8 @@ public class ZombieController : MonoBehaviour
                     state = STATE.WONDER;
                     agent.ResetPath();
                 }
-
                 break;
+
 
             case STATE.ATTACK:
                 TurnOffAllTriggerAnim();
@@ -150,11 +152,15 @@ public class ZombieController : MonoBehaviour
                 print("Attack State");
                 break;
 
+
             case STATE.DEAD:
-                GameObject tempRd = Instantiate(ragdollPrefab, this.transform.position, this.transform.rotation);
-                tempRd.transform.Find("Hips").GetComponent<Rigidbody>().AddForce(Camera.main.transform.forward * 1000);
-                Destroy(this.gameObject);             
+                //GameObject tempRd = Instantiate(ragdollPrefab, this.transform.position, this.transform.rotation);
+                //tempRd.transform.Find("Hips").GetComponent<Rigidbody>().AddForce(Camera.main.transform.forward * 1000);
+                //Destroy(this.gameObject);             
+                Destroy(agent);
+                this.GetComponent<SinkToGround>().ReadyToSink();
                 break;
+
 
             default:
                 break;
@@ -202,4 +208,19 @@ public class ZombieController : MonoBehaviour
         anim.SetBool("isDead", true);
         state = STATE.DEAD;
     }
+
+    int damageAmount = 5;
+    public void DamagePlayer()
+    {
+        if(target!=null)
+        {
+            target.GetComponent<PlayerController>().TakeHit(damageAmount); // create a random sound when player takes damage.
+        }
+    }
+}
+
+public class GameState
+{
+    public static bool isGameOver = false;
+    
 }
