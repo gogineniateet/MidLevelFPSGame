@@ -10,6 +10,7 @@ public class SpawnManager : MonoBehaviour
     public float spawnRadius;
     public bool spawnOnStart = true;
     Vector3 result;
+    Stack<GameObject> zombie = new Stack<GameObject>();
 
 
     // Start is called before the first frame update
@@ -17,11 +18,11 @@ public class SpawnManager : MonoBehaviour
     {
         if(spawnOnStart)
         {
-            CreateAllZombies();
+            CreateAllZombies(10);
         }
     }
 
-    private void CreateAllZombies()
+    public void CreateAllZombies(int value)
     {
         for (int i = 0; i < number; i++)
         {
@@ -30,7 +31,8 @@ public class SpawnManager : MonoBehaviour
             if (NavMesh.SamplePosition(randonPoint, out hit, 10f, NavMesh.AllAreas))
             {
                 result = hit.position;
-                Instantiate(zombiePrefabs[0], result, Quaternion.identity);
+                zombie.Push(Instantiate(zombiePrefabs[0], result, Quaternion.identity));
+                //zombiePrefabs[0].SetActive(false);
                 //Instantiate(zombiePrefabs[1], result, Quaternion.identity);
                 //Instantiate(zombiePrefabs[2], result, Quaternion.identity);
                 //Instantiate(zombiePrefabs[3], result, Quaternion.identity);
@@ -42,13 +44,17 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-
+    public void BackToPool(GameObject obj)
+    {
+        zombie.Push(obj);
+        zombie.Peek().SetActive(false);
+    }
 
     private void OnTriggerEnter(Collider other)
     {
         if(!spawnOnStart && other.gameObject.tag == "Player")
         {
-            CreateAllZombies();
+            CreateAllZombies(10);
         }
     }
 }

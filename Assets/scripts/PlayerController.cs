@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
     public GameObject steveModelPrefab;
     Rigidbody rb;
     CapsuleCollider colliders;
+    SpawnManager spawn;
+    public GameObject stevePrefab;
 
     Quaternion camRotation;
     Quaternion playerRotation;
@@ -31,12 +33,16 @@ public class PlayerController : MonoBehaviour
     int maxMedical = 100;
     int reloadAmmo = 0;
     int maxReloadAmmo = 10;
-
+    int zombieDeadCount;
+    
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         colliders = GetComponent<CapsuleCollider>();
+        spawn = GameObject.Find("SpawnPosition").GetComponent<SpawnManager>();
+
+
         //animator = GetComponent<Animator>();
         //audioSource = GetComponent<AudioSource>();
     }
@@ -99,6 +105,7 @@ public class PlayerController : MonoBehaviour
             GameObject hitZombie = hitInfo.collider.gameObject;
             if (hitZombie.tag == "Zombie")
             {
+                zombieDeadCount++;
                 if(UnityEngine.Random.Range(0,10)<5)
                 {
                     GameObject tempRD = hitZombie.GetComponent<ZombieController>().ragdollPrefab;
@@ -110,6 +117,10 @@ public class PlayerController : MonoBehaviour
                 {
                     hitZombie.GetComponent<ZombieController>().KillZombie();
                 }
+                if (zombieDeadCount == spawn.number)
+                {
+                    GameOverDance();
+                }
                 //GameObject tempRd = Instantiate(ragdollPrefab, this.transform.position, this.transform.rotation);
                 //tempRd.transform.Find("Hips").GetComponent<Rigidbody>().AddForce(Camera.main.transform.forward * 1000);
                 //Destroy(this.gameObject);
@@ -117,6 +128,15 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+    }
+
+    private void GameOverDance()
+    {
+        Vector3 position = new Vector3(transform.position.x, Terrain.activeTerrain.SampleHeight(this.transform.position), transform.position.z);
+        GameObject tempSteve = Instantiate(steveModelPrefab, position, this.transform.rotation);
+        tempSteve.GetComponent<Animator>().SetTrigger("Dance");
+        Destroy(this.gameObject);       
+        
     }
 
     private void FixedUpdate()

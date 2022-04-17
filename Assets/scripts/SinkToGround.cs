@@ -6,9 +6,16 @@ public class SinkToGround : MonoBehaviour
 {
     float destroyHeight;
     public float time;
+    SpawnManager spawn;
+
+    private void Awake()
+    {
+        spawn = GameObject.Find("SpawnPosition").GetComponent<SpawnManager>();
+    }
     // Start is called before the first frame update
     void Start()
     {
+
         if(this.gameObject.tag == "RagdollZombie")
         {
            Invoke("ReadyToSink",2f);
@@ -26,7 +33,9 @@ public class SinkToGround : MonoBehaviour
         this.transform.Translate(0f, -0.001f, 0f);
         if(transform.position.y > destroyHeight)
         {
-            Destroy(this.gameObject);
+            //Destroy(this.gameObject);
+            //this.gameObject.SetActive(false);
+            spawn.BackToPool(this.gameObject);
         }
     }
     public void ReadyToSink()
